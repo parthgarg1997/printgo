@@ -1,0 +1,13 @@
+{
+    "bucketName": "amityfileupload-windows",
+    "authPolicyName": "s3_amplify_5d283557",
+    "unauthPolicyName": "s3_amplify_5d283557",
+    "authRoleName": {
+        "Ref": "AuthRoleName"
+    },
+    "unauthRoleName": {
+        "Ref": "UnauthRoleName"
+    },
+    "authPermissions": "w",
+    "unauthPermissions": ""
+}

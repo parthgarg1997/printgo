@@ -1,0 +1,10 @@
+{
+    "AppSyncApiName": "printgo",
+    "DynamoDBBillingMode": "PAY_PER_REQUEST",
+    "AuthCognitoUserPoolId": {
+        "Fn::GetAtt": [
+            "authcognitoa5c811e4",
+            "Outputs.UserPoolId"
+        ]
+    }
+}

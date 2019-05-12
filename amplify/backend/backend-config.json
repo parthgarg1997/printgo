@@ -1,0 +1,23 @@
+{
+	"auth": {
+		"cognitoa5c811e4": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation"
+		}
+	},
+	"api": {
+		"printgo": {
+			"service": "AppSync",
+			"providerPlugin": "awscloudformation",
+			"output": {
+				"securityType": "AMAZON_COGNITO_USER_POOLS"
+			}
+		}
+	},
+	"storage": {
+		"s35d283557": {
+			"service": "S3",
+			"providerPlugin": "awscloudformation"
+		}
+	}
+}

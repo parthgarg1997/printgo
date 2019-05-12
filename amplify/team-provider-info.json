@@ -1,0 +1,19 @@
+{
+    "android": {
+        "awscloudformation": {
+            "AuthRoleName": "printgo-20190512173656-authRole",
+            "UnauthRoleArn": "arn:aws:iam::598615634026:role/printgo-20190512173656-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::598615634026:role/printgo-20190512173656-authRole",
+            "Region": "ap-south-1",
+            "DeploymentBucketName": "printgo-20190512173656-deployment",
+            "UnauthRoleName": "printgo-20190512173656-unauthRole",
+            "StackName": "printgo-20190512173656",
+            "StackId": "arn:aws:cloudformation:ap-south-1:598615634026:stack/printgo-20190512173656/702d0180-74ae-11e9-b4fc-0af78aa5c40c"
+        },
+        "categories": {
+            "auth": {
+                "cognitoa5c811e4": {}
+            }
+        }
+    }
+}
