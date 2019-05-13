@@ -87,6 +87,7 @@ public class Pay extends AppCompatActivity {
                     /*Call Backs*/
                     public void someUIErrorOccurred(String inErrorMessage) {
                         Toast.makeText(getApplicationContext(), "UI Error " + inErrorMessage , Toast.LENGTH_LONG);
+                        finish();
                     }
                     public void onTransactionResponse(Bundle inResponse) {
                         Toast.makeText(getApplicationContext(), "Payment Transaction response " + inResponse.toString(), Toast.LENGTH_LONG).show();
@@ -94,15 +95,19 @@ public class Pay extends AppCompatActivity {
                     }
                     public void networkNotAvailable() {
                         Toast.makeText(getApplicationContext(), "Network connection error: Check your internet connectivity", Toast.LENGTH_LONG).show();
+                        finish();
                     }
                     public void clientAuthenticationFailed(String inErrorMessage) {
                         Toast.makeText(getApplicationContext(), "Authentication failed: Server error" + inErrorMessage, Toast.LENGTH_LONG).show();
+                        finish();
                     }
                     public void onErrorLoadingWebPage(int iniErrorCode, String inErrorMessage, String inFailingUrl) {
                         Toast.makeText(getApplicationContext(), "Unable to load webpage " + inErrorMessage, Toast.LENGTH_LONG).show();
+                        finish();
                     }
                     public void onBackPressedCancelTransaction() {
                         Toast.makeText(getApplicationContext(), "Transaction cancelled" , Toast.LENGTH_LONG).show();
+                        finish();
                     }
                     public void onTransactionCancel(String inErrorMessage, Bundle inResponse) {}
                 });
