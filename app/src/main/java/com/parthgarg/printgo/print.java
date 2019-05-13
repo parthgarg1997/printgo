@@ -3,6 +3,7 @@ package com.parthgarg.printgo;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -25,7 +26,14 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.services.s3.AmazonS3Client;
 
+import com.amazonaws.mobileconnectors.lambdainvoker.LambdaFunction;
+import com.amazonaws.mobileconnectors.lambdainvoker.*;
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.regions.Regions;
+import com.itextpdf.text.pdf.PdfReader;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,7 +44,21 @@ public class print extends AppCompatActivity {
     Switch colorSwitch;
     String folder="amityfileupload-windows";
     String uuid=UUID.randomUUID().toString();
+    String FilePath;
+    String email="abc@kyz.com",phone="7777777777";
     private static final String TAG = MainActivity.class.getSimpleName();
+
+    public interface MyInterface {
+
+        /**
+         * Invoke the Lambda function "AndroidBackendLambdaFunction".
+         * The function name is the method name.
+         */
+        @LambdaFunction
+        ResponseClass MyFunction(RequestClass request);
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,7 +79,10 @@ public class print extends AppCompatActivity {
             }
         };
         */
+        LambdaInvokerFactory factory = new LambdaInvokerFactory(this.getApplicationContext(),
+                Regions.AP_SOUTH_1, AWSMobileClient.getInstance().getCredentialsProvider());
 
+        final MyInterface myInterface = factory.build(MyInterface.class);
 
 
         SelectFile.setOnClickListener(new View.OnClickListener() {
@@ -82,14 +107,11 @@ public class print extends AppCompatActivity {
                     Toast.makeText(print.this,"invalid",Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    uploadWithTransferUtility();
-                    RequestClass req = new RequestClass();
-                    req.setColored(colorSwitch.isChecked());
-                    req.setCustomer_id("a");
-                    req.setEmail("abc@kyz.com");
-                    req.setMobile_no("+91999999999");
-                    req.setFolder(folder);
-                    req.setFile_name(uuid);
+
+                    Lambda(myInterface);
+                   // uploadWithTransferUtility();
+
+
                 }
             }
         });
@@ -105,7 +127,7 @@ public class print extends AppCompatActivity {
             }
         });*/
     }
-    public void uploadWithTransferUtility() {
+    /*public void uploadWithTransferUtility() {
 
         TransferUtility transferUtility =
                 TransferUtility.builder()
@@ -157,7 +179,7 @@ public class print extends AppCompatActivity {
         Log.d("YourActivity", "Bytes Transferred: " + uploadObserver.getBytesTransferred());
         Log.d("YourActivity", "Bytes Total: " + uploadObserver.getBytesTotal());
     }
-
+    */
     public void uploadfile()
     {
         Intent intent=new Intent();
@@ -171,15 +193,73 @@ public class print extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode==86 && resultCode==RESULT_OK && data!=null)
         {
-            File file=new File(PathUtils.getPath(this, data.getData())) ;//new File("/storage/emulated/0/Xender/abc.pdf");//new File(data.getData().getPath());
+            FilePath=PathUtils.getPath(this, data.getData());
+            File file=new File(FilePath) ;//new File("/storage/emulated/0/Xender/abc.pdf");//new File(data.getData().getPath());
             pdfuri= file;
             status.setText("Your File Selected is  "+file.getName());
+            Resourses.pdfUri=pdfuri;
+            Resourses.File_name=file.getName();
             if (pdfuri == null || pdfuri.isDirectory() || !pdfuri.exists()) {
                 Toast.makeText(print.this,"invalid",Toast.LENGTH_SHORT);
             }
         }
         else
             Toast.makeText(this, "Please select atleast one file", Toast.LENGTH_SHORT).show();
+    }
+
+    public void Lambda(final MyInterface myInterface)
+    {
+        RequestClass req = new RequestClass();
+        req.setColored(colorSwitch.isChecked());
+        String cust_id=AWSMobileClient.getInstance().getUsername();
+        req.setCustomer_id(cust_id);
+        req.setEmail(email);
+        req.setMobile_no(phone);
+        req.setFolder(folder);
+        req.setFile_name(uuid);
+
+        PdfReader reader = null;
+        try {
+            reader = new PdfReader(FilePath);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        int aa = reader.getNumberOfPages();
+        Resourses.email=email;
+        Resourses.phone_no=phone;
+        Resourses.No_page=aa;
+        Resourses.cust_id=cust_id;
+        req.setNo_page(aa);
+
+        Resourses.Colored=colorSwitch.isChecked();
+
+        new  AsyncTask<RequestClass, Void, ResponseClass>() {
+            @Override
+            protected ResponseClass doInBackground(RequestClass... params) {
+                // invoke "echo" method. In case it fails, it will throw a
+                // LambdaFunctionException.
+                try {
+                    return myInterface.MyFunction(params[0]);
+                } catch (LambdaFunctionException lfe) {
+                    Log.e("Tag", "Failed to invoke echo", lfe);
+                    return null;
+                }
+            }
+            @Override
+            protected void onPostExecute(ResponseClass result) {
+                if (result == null) {
+                    return;
+                }
+
+                // Do a toast
+                Resourses.Amount=result.rs;
+                Resourses.CheckSum=result.Checksum;
+                Resourses.order_no=result.OrderId;
+                Intent i=new Intent(print.this,Pay.class);
+                startActivity(i);
+            }
+        }.execute(req);
     }
 }
 

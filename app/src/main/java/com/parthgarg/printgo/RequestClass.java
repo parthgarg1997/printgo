@@ -2,11 +2,11 @@ package com.parthgarg.printgo;
 
 public  class RequestClass {
 
-	static String folder;
-	static String file_name;
-	static int no_page;
-	static String customer_id,mobile_no,email;
-	static Boolean colored;
+	 String folder;
+	 String file_name;
+	 int no_page;
+	 String customer_id,mobile_no,email;
+	 Boolean colored;
 	
 	public RequestClass()
 	{

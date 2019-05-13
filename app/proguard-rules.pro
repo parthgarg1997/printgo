@@ -11,6 +11,9 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-keepclassmembers class com.paytm.pgsdk.PaytmWebView$PaytmJavaScriptInterface {
+   public *;
+}
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
