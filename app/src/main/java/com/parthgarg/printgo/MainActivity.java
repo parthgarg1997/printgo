@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
                         case SIGNED_IN:
                             Intent i = new Intent(MainActivity.this,print.class);
                             startActivity(i);
+                            finish();
                             break;
                         case SIGNED_OUT:
                             showSignIn();

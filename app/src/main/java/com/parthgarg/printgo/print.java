@@ -10,12 +10,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amazonaws.mobile.client.AWSMobileClient;
 import com.amazonaws.mobile.client.Callback;
 import com.amazonaws.mobile.client.UserStateDetails;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserDetails;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GetDetailsHandler;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
@@ -23,19 +26,40 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.services.s3.AmazonS3Client;
 
 import java.io.File;
+import java.util.Map;
 import java.util.UUID;
 
 public class print extends AppCompatActivity {
 
     private File pdfuri;
     TextView status;
+    Switch colorSwitch;
+    String folder="amityfileupload-windows";
+    String uuid=UUID.randomUUID().toString();
     private static final String TAG = MainActivity.class.getSimpleName();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_print);
         Button SelectFile=(Button)findViewById(R.id.SelectFile);
+        colorSwitch=(Switch)findViewById(R.id.Colored);
         status=(TextView)findViewById(R.id.ShowStatus);
+
+      /*  GetDetailsHandler getDetailsHandler = new GetDetailsHandler() {
+            @Override
+            public void onSuccess(CognitoUserDetails cognitoUserDetails) {
+                Toast.makeText(print.this,cognitoUserDetails.getAttributes().getAttributes().get("email"),Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Exception exception) {
+                // Fetch user details failed, check exception for the cause
+            }
+        };
+        */
+
+
+
         SelectFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -54,10 +78,22 @@ public class print extends AppCompatActivity {
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                uploadWithTransferUtility();
+                if (pdfuri == null || pdfuri.isDirectory() || !pdfuri.exists()) {
+                    Toast.makeText(print.this,"invalid",Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    uploadWithTransferUtility();
+                    RequestClass req = new RequestClass();
+                    req.setColored(colorSwitch.isChecked());
+                    req.setCustomer_id("a");
+                    req.setEmail("abc@kyz.com");
+                    req.setMobile_no("+91999999999");
+                    req.setFolder(folder);
+                    req.setFile_name(uuid);
+                }
             }
         });
-        AWSMobileClient.getInstance().initialize(getApplicationContext(), new Callback<UserStateDetails>() {
+     /*   AWSMobileClient.getInstance().initialize(getApplicationContext(), new Callback<UserStateDetails>() {
             @Override
             public void onResult(UserStateDetails userStateDetails) {
                 Log.i(TAG, "AWSMobileClient initialized. User State is " + userStateDetails.getUserState());
@@ -67,8 +103,7 @@ public class print extends AppCompatActivity {
             public void onError(Exception e) {
                 Log.e(TAG, "Initialization error.", e);
             }
-        });
-
+        });*/
     }
     public void uploadWithTransferUtility() {
 
@@ -82,8 +117,8 @@ public class print extends AppCompatActivity {
 
 
         TransferObserver uploadObserver =
-                transferUtility.upload("amityfileupload-windows",
-                        "public/"+ UUID.randomUUID().toString(),
+                transferUtility.upload(folder,
+                        "public/"+ uuid,
                         pdfuri);
 
         // Attach a listener to the observer to get state update and progress notifications
@@ -93,6 +128,9 @@ public class print extends AppCompatActivity {
             public void onStateChanged(int id, TransferState state) {
                 if (TransferState.COMPLETED == state) {
                     Toast.makeText(print.this,"finnaly",Toast.LENGTH_SHORT).show();
+                    Intent i=new Intent(print.this,Pay.class);
+                    startActivity(i);
+                    pdfuri=null;
                 }
             }
 
