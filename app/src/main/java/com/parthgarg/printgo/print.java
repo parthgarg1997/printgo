@@ -103,7 +103,7 @@ public class print extends AppCompatActivity {
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (pdfuri == null || pdfuri.isDirectory() || !pdfuri.exists()) {
+                if (pdfuri == null || pdfuri.isDirectory() || !pdfuri.exists()||Resourses.File_name==null) {
                     Toast.makeText(print.this,"invalid",Toast.LENGTH_SHORT).show();
                 }
                 else {
@@ -194,11 +194,16 @@ public class print extends AppCompatActivity {
         if(requestCode==86 && resultCode==RESULT_OK && data!=null)
         {
             FilePath=PathUtils.getPath(this, data.getData());
+            if(FilePath.startsWith("raw:"))
+            {
+                FilePath=FilePath.replaceFirst("raw:", "");
+            }
+            Toast.makeText(print.this,FilePath,Toast.LENGTH_SHORT).show();
             File file=new File(FilePath) ;//new File("/storage/emulated/0/Xender/abc.pdf");//new File(data.getData().getPath());
             pdfuri= file;
             status.setText("Your File Selected is  "+file.getName());
             Resourses.pdfUri=pdfuri;
-            Resourses.File_name=file.getName();
+            Resourses.File_name=uuid+file.getName();
             if (pdfuri == null || pdfuri.isDirectory() || !pdfuri.exists()) {
                 Toast.makeText(print.this,"invalid",Toast.LENGTH_SHORT);
             }
@@ -216,8 +221,7 @@ public class print extends AppCompatActivity {
         req.setEmail(email);
         req.setMobile_no(phone);
         req.setFolder(folder);
-        req.setFile_name(uuid);
-
+        req.setFile_name(Resourses.File_name);
         PdfReader reader = null;
         try {
             reader = new PdfReader(FilePath);

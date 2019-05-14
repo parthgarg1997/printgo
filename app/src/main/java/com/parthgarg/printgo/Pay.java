@@ -36,7 +36,6 @@ public class Pay extends AppCompatActivity {
     PaytmPGService Service;
     private File pdfuri = Resourses.pdfUri;
     String folder = "amityfileupload-windows";
-    String uuid= UUID.randomUUID().toString();
     private static final String TAG = MainActivity.class.getSimpleName();
 
     public interface MyInterface {
@@ -66,7 +65,7 @@ public class Pay extends AppCompatActivity {
         final Pay.MyInterface myInterface = factory.build(MyInterface.class);
 
 
-        file_name.setText(Resourses.File_name);
+        file_name.setText(pdfuri.getName());
         No_page.setText(Resourses.No_page + "");
         if (Resourses.Colored == true)
             Colored.setText("Colored");
@@ -168,7 +167,7 @@ public class Pay extends AppCompatActivity {
 
         TransferObserver uploadObserver =
                 transferUtility.upload(folder,
-                        "public/" + uuid+Resourses.File_name,
+                        "public/" + Resourses.File_name,
                         pdfuri,myObjectMetadata);
         // Attach a listener to the observer to get state update and progress notifications
         uploadObserver.setTransferListener(new TransferListener() {
