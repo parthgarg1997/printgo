@@ -66,12 +66,12 @@ public class Pay extends AppCompatActivity {
 
 
         file_name.setText(pdfuri.getName());
-        No_page.setText(Resourses.No_page + "");
+        No_page.setText(Resourses.No_page + "" + "pages");
         if (Resourses.Colored == true)
             Colored.setText("Colored");
         else
             Colored.setText("Black & White");
-        Amount.setText(Resourses.Amount + "");
+        Amount.setText("Rs. " + Resourses.Amount + "");
         OrderNo.setText(Resourses.order_no);
         Vendor.setText(Resourses.Vendor);
 
